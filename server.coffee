@@ -19,7 +19,8 @@ app = require("http").createServer(handler)
 io = require("socket.io").listen(app)
 fs = require("fs")
 
-app.listen 3456
+port = process.env.PORT || 3456
+app.listen port
 io.set "log level", 1
 conexiones = []
 users = []
@@ -45,7 +46,7 @@ io.sockets.on "connection", (socket) ->
   socket.on "click", (data) ->
     user.clicks.push new Date
     socket.get 'name', (err, nombre) ->
-      cl "click! #{user.name}: #{user.clicks.length}"
+      cl "click! #{user.name}: #{user.clicks.length} clicks"
       for conexion in conexiones
-        conexion.emit 'clickDe', user.name
+        conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
       
