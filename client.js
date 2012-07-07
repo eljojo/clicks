@@ -1,4 +1,4 @@
-var socket = io.connect('http://192.168.1.94');
+var socket = io.connect('http://'+window.location.host);
 $(function() {
   $("#boton").hide()
   $("#nombre").val('')
