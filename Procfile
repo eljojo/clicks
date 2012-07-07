@@ -1,1 +1,1 @@
-web: node heroku.js
+web: coffee server.coffee
