@@ -30,6 +30,7 @@ io.sockets.on "connection", (socket) ->
     id: conexiones.length
     name: ''
     clicks: []
+    lastClick: ''
   users.push user
   cl "+ ahora somos #{users.length}"
   
@@ -43,10 +44,10 @@ io.sockets.on "connection", (socket) ->
     socket.set 'name', name, ->
       socket.emit 'ready'
     
-  socket.on "click", (data) ->
+  socket.on "clickDown", (data) ->
     user.clicks.push new Date
-    socket.get 'name', (err, nombre) ->
-      cl "click! #{user.name}: #{user.clicks.length} clicks"
-      for conexion in conexiones
-        conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
+    user.lastClick = new Date
+    cl "click! #{user.name}: #{user.clicks.length} clicks"
+    for conexion in conexiones
+      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
       
