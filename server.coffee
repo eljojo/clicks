@@ -5,7 +5,22 @@
 cl = (what) -> console.log(what)
 # remover elementos de un array. sacado de http://stackoverflow.com/questions/4825812/clean-way-to-remove-element-from-javascript-array-with-jquery-coffeescript
 Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
+# Date object a hora
+getHora = (date) -> 
+  minutos = date.getMinutes()
+  minutos = '0'+minutos if minutos < 10
+  segundos = date.getSeconds()
+  segundos = '0'+segundos if segundos < 10
+  date.getHours() + ":#{minutos}:#{segundos}"
 
+calcularPuntaje = (user) ->
+  clicks = user.clicks
+  totalClicks = clicks.length
+  tiempo_de_juego = (clicks[totalClicks - 1].getTime() - clicks[0].getTime())/1000
+  puntaje = Math.pow(totalClicks, 2) * Math.log(tiempo_de_juego) / (Math.log(10) * Math.pow(tiempo_de_juego, 1.2))
+  if puntaje == -Infinity then puntaje = 0
+  return Math.round(puntaje * 10) 
+  
 handler = (req, res) ->
   peticion = (if (req.url is "/") then "/client.html" else req.url)
   fs.readFile __dirname + peticion, (err, data) ->
@@ -45,9 +60,17 @@ io.sockets.on "connection", (socket) ->
       socket.emit 'ready'
     
   socket.on "clickDown", (data) ->
+    #user.clicks.push new Date
+    #user.lastClick = new Date
+    # cl "click down! #{user.name}: #{getHora(user.lastClick)}"
+#    for conexion in conexiones
+#      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
+    
+  socket.on "clickUp", (data) ->
     user.clicks.push new Date
-    user.lastClick = new Date
-    cl "click! #{user.name}: #{user.clicks.length} clicks"
+    puntaje = calcularPuntaje(user)
+    cl "puntaje de usuario #{user.name}: #{puntaje}"
     for conexion in conexiones
-      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
+      conexion.emit 'clickDe', {name: user.name, puntaje: puntaje}
       
+
