@@ -1,4 +1,4 @@
-var socket = io.connect('http://'+window.location.host);
+var socket = io.connect('http://eljojo.net:3456');
 $(function() {
   $("#boton").hide()
   $("#nombre").val('')
