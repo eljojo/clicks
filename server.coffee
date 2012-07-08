@@ -25,6 +25,7 @@ obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTim
 
 enviarTop = ->
   # -- tops puntaje
+  user.puntaje = calcularPuntaje(user) for user in users
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
@@ -73,7 +74,7 @@ conexiones = []
 users = []
 setInterval( ->
   enviarTop() if users.length > 0 and users[0].clicks.length > 0
-, 1000)
+, 500)
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
@@ -100,7 +101,6 @@ io.sockets.on "connection", (socket) ->
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
       user.lastClick = ''
-      user.puntaje = calcularPuntaje(user)
       cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
       
