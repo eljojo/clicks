@@ -29,14 +29,14 @@ enviarTop = ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
-  topsClickPressed = users.sort (a,b) ->
-    return 0 if b.clicks.length == 0 and a.clicks.length == 0
-    return 1 if b.clicks.length == 0
-    return -1 if a.clicks.length == 0
-    b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
-  actualTime = new Date()
-  #masTiempoClick = user if user.lastClick != '' and user.lastClick.getTime() > userLastClick.lastClick.getTime()
-  topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
+  # topsClickPressed = users.sort (a,b) ->
+  #   return 0 if b.clicks.length == 0 and a.clicks.length == 0
+  #   return 1 if b.clicks.length == 0
+  #   return -1 if a.clicks.length == 0
+  #   b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
+  # actualTime = new Date()
+  # #masTiempoClick = user if user.lastClick != '' and user.lastClick.getTime() > userLastClick.lastClick.getTime()
+  # topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
   # -- top por tiempo y clicks
   masAntiguo = users[0]
   masAntiguo = { clicks: [new Date()] } if users[0].clicks.length == 0
@@ -48,7 +48,7 @@ enviarTop = ->
   # formateamos el resultado y enviamos
   top =
     puntajes: topsPuntaje
-    clickApretado: topsClickPressed
+    #clickApretado: topsClickPressed
     tiempo: { nombre: masAntiguo.name, id: masAntiguo.id, tiempo: obtenerSegundos masAntiguo.clicks[0] }
     clicks: { nombre: masClicks.name, id: masClicks.id, clicks: masClicks.clicks.length }
   conexion.emit 'top', top for conexion in conexiones
