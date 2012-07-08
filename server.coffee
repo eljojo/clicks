@@ -27,23 +27,24 @@ enviarTop = ->
   # tops puntaje
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
-  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, puntaje: user.puntaje}
+  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # tops click presionado
   topsClickPressed = users.sort (a,b) ->
     b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
   actualTime = new Date()
-  topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
+  topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
   # top de usuarios
   masAntiguo = users[0]
   masClicks = users[0]
   for user in users
+    continue if user.clicks.length == 0
     masAntiguo = user if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
   top =
     puntajes: topsPuntaje
     clickApretado: topsClickPressed
-    tiempo: { nombre: masAntiguo.name, tiempo: obtenerSegundos masAntiguo.clicks[0] }
-    clicks: { nombre: masClicks.name, clicks: masClicks.clicks.length }
+    tiempo: { nombre: masAntiguo.name, id: masAntiguo.id, tiempo: obtenerSegundos masAntiguo.clicks[0] }
+    clicks: { nombre: masClicks.name, id: masClicks.id, clicks: masClicks.clicks.length }
   conexion.emit 'top', top for conexion in conexiones
 
 handler = (req, res) ->
@@ -67,7 +68,7 @@ users = []
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   user = 
-    id: conexiones.length
+    id: ''
     name: ''
     clicks: []
     lastClick: ''
@@ -80,10 +81,11 @@ io.sockets.on "connection", (socket) ->
     users.remove user
     cl "- ahora somos #{users.length}"
   
-  socket.on "name", (name) ->
-    user.name = name
-    socket.set 'name', name, ->
-      socket.emit 'ready'
+  socket.on "userData", (data) ->
+    user.name = data.nombre
+    user.id = data.id
+    cl "llegó #{user.name}, id: #{user.id}"
+    socket.emit 'ready'
     
   socket.on "clickDown", (data) ->
     user.lastClick = new Date
