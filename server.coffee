@@ -21,12 +21,24 @@ calcularPuntaje = (user) ->
   if puntaje == -Infinity then puntaje = 0
   return Math.round(puntaje * 10) 
 
+obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTime())/1000
 
 enviarTop = ->
+  # tops puntaje
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, puntaje: user.puntaje}
-  conexion.emit 'topPuntajes', topsPuntaje for conexion in conexiones
+  # top de usuarios
+  masAntiguo = users[0]
+  masClicks = users[0]
+  for user in users
+    masAntiguo = user if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
+    masClicks = user if user.clicks.length > masAntiguo.clicks.length
+  top =
+    puntajes: topsPuntaje
+    tiempo: { nombre: masAntiguo.name, tiempo: obtenerSegundos masAntiguo.clicks[0] }
+    clicks: { nombre: masClicks.name, clicks: masClicks.clicks.length }
+  conexion.emit 'top', top for conexion in conexiones
 
 handler = (req, res) ->
   peticion = (if (req.url is "/") then "/client.html" else req.url)

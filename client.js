@@ -23,7 +23,7 @@ $(function() {
       $("#clicks li").last().remove()
     }
   })
-  socket.on('enviandoTop', function(top){
+  socket.on('top', function(top){
     console.log(top)
   })
   socket.on('ready', function(){
