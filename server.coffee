@@ -78,6 +78,7 @@ io.sockets.on "connection", (socket) ->
   socket.on "userData", (data) ->
     user.name = data.nombre
     user.id = data.id
+    cl "llegó #{user.name}, id: #{user.id}"
     socket.emit 'ready'
     
   socket.on "clickDown", (data) ->
