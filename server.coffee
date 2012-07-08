@@ -70,6 +70,7 @@ app.listen port
 io.set "log level", 1
 conexiones = []
 users = []
+setInterval(enviarTop, 1000)
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
@@ -98,5 +99,4 @@ io.sockets.on "connection", (socket) ->
       user.puntaje = calcularPuntaje(user)
       cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
-      enviarTop()
       
