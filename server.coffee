@@ -32,7 +32,7 @@ enviarTop = ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
-  topsClickPressed = (item for item in users when user.lastClick != '') # filtramos
+  topsClickPressed = (user for user in users when user.lastClick != '') # filtramos
   topsClickPressed = topsClickPressed.sort (a,b) ->
     b.lastClick.getTime() - a.lastClick.getTime()
   topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: obtenerSegundos user.lastClick }
