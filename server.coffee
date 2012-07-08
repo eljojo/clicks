@@ -70,7 +70,7 @@ io.sockets.on "connection", (socket) ->
   user = 
     id: ''
     name: ''
-    clicks: []
+    clicks: [new Date]
     lastClick: ''
     puntaje: 0
   users.push user
