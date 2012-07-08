@@ -35,6 +35,7 @@ enviarTop = ->
     return -1 if a.clicks.length == 0
     b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
   actualTime = new Date()
+  #masTiempoClick = user if user.lastClick != '' and user.lastClick.getTime() > userLastClick.lastClick.getTime()
   topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
   # -- top por tiempo y clicks
   masAntiguo = users[0]
@@ -95,6 +96,7 @@ io.sockets.on "connection", (socket) ->
     # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
+      user.lastClick = ''
       user.puntaje = calcularPuntaje(user)
       cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
