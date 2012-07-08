@@ -48,7 +48,7 @@ enviarTop = ->
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
   randomNoob = Math.round((users.length - 1)* Math.random())
   randomNoob = 0 if randomNoob < 0
-  masNoob = users[randomNoob].map (user) -> {nombre: user.name, id: user.id}
+  masNoob = {nombre: users[randomNoob].name, id: users[randomNoob].id}
     # formateamos el resultado y enviamos
   top =
     puntajes: topsPuntaje
