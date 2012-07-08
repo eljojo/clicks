@@ -71,7 +71,9 @@ app.listen port
 io.set "log level", 1
 conexiones = []
 users = []
-setInterval(enviarTop, 1000)
+setInterval( ->
+  enviarTop() if users.length > 0 and users[0].clicks.length > 0
+, 1000)
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
