@@ -26,8 +26,9 @@ obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTim
 
 enviarTop = ->
   # -- tops puntaje
-  for user in users
+  users = users.map (user) ->
     user.puntaje = calcularPuntaje(user)
+    user
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
