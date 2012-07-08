@@ -27,7 +27,7 @@ enviarTop = ->
   # tops puntaje
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
-  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, puntaje: user.puntaje}
+  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # top de usuarios
   masAntiguo = users[0]
   masClicks = users[0]
@@ -37,8 +37,8 @@ enviarTop = ->
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
   top =
     puntajes: topsPuntaje
-    tiempo: { nombre: masAntiguo.name, tiempo: obtenerSegundos masAntiguo.clicks[0] }
-    clicks: { nombre: masClicks.name, clicks: masClicks.clicks.length }
+    tiempo: { nombre: masAntiguo.name, id: masAntiguo.id, tiempo: obtenerSegundos masAntiguo.clicks[0] }
+    clicks: { nombre: masClicks.name, id: masClicks.id, clicks: masClicks.clicks.length }
   conexion.emit 'top', top for conexion in conexiones
 
 handler = (req, res) ->
