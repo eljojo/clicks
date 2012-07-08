@@ -24,20 +24,19 @@ calcularPuntaje = (user) ->
 obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTime())/1000
 
 enviarTop = ->
-  # tops puntaje
+  # -- tops puntaje
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
-  # tops click presionado
+  # -- tops click presionado
   topsClickPressed = users.sort (a,b) ->
     return 0 if b.clicks.length == 0 and a.clicks.length == 0
     return 1 if b.clicks.length == 0
     return -1 if a.clicks.length == 0
-    
     b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
   actualTime = new Date()
   topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
-  # top de usuarios
+  # -- top por tiempo y clicks
   masAntiguo = users[0]
   masAntiguo = { clicks: [new Date()] } if users[0].clicks.length == 0
   masClicks = users[0]
@@ -45,6 +44,7 @@ enviarTop = ->
     continue if user.clicks.length == 0
     masAntiguo = user if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
+  # formateamos el resultado y enviamos
   top =
     puntajes: topsPuntaje
     clickApretado: topsClickPressed
@@ -74,38 +74,29 @@ io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
     user = 
-      id: ''
-      name: ''
+      id: data.id
+      name: data.nombre
       clicks: []
       lastClick: ''
       puntaje: 0
     users.push user
     cl "+ ahora somos #{users.length}"
-    
-    user.name = data.nombre
-    user.id = data.id
     cl "llegó #{user.name}, id: #{user.id}"
     socket.emit 'ready'
-    
+    # -- user disconnect
     socket.on 'disconnect', (socket) ->
       conexiones.remove socket
       users.remove user
+      cl "se fue #{user.name}"
       cl "- ahora somos #{users.length}"
-    
+    # -- user click down
     socket.on "clickDown", (data) ->
       user.lastClick = new Date
-      cl "puntaje de usuario #{user.name}: #{user.puntaje}"
-      for conexion in conexiones
-        conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
-    
+    # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
       user.puntaje = calcularPuntaje(user)
-  #     for conexion in conexiones
-  #      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
+      cl "puntaje de #{user.name}: #{user.puntaje}"
+      socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
       enviarTop()
-    
-
-  
-
-
+      
