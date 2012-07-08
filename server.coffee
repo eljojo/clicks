@@ -16,7 +16,7 @@ getHora = (date) ->
 obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTime())/1000
 
 calcularPuntaje = (user) ->
-  return Math.round(Math.random()*23456) if "#{user.id}" == "648489362"
+  # return Math.round(Math.random()*23456) if "#{user.id}" == "648489362" # epic trampa is epic trampa
   clicks = user.clicks
   totalClicks = clicks.length
   return 0 if totalClicks == 0
@@ -24,7 +24,6 @@ calcularPuntaje = (user) ->
   puntaje = Math.pow(totalClicks, 2) * Math.log(tiempo_de_juego) / (Math.log(10) * Math.pow(tiempo_de_juego, 1.2))
   if puntaje == -Infinity then puntaje = 0
   return Math.round(puntaje * 10) 
-
 
 enviarTop = ->
   # -- tops puntaje
