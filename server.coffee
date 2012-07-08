@@ -85,20 +85,19 @@ usersStats = []
 clicksStats = [] # usamos este arreglo para las estadisticas en tiempo real
 
 sendStats = ->
-  if clicksStats.length > 0
-    for socket in usersStats 
-      socket.emit 'stats!', {date: clicksStats[0], clicks: clicksStats.length }
+  for socket in usersStats 
+    socket.emit 'stats!', {date: new Date, clicks: clicksStats.length }
   clicksStats = []
 
 setInterval( ->
   enviarTop() if users.length > 0 and users[0].clicks.length > 0
-  sendStats() if usersStats.length > 0 and clicksStats.length > 0
+  sendStats() if usersStats.length > 0
 , 250)
 
 io.sockets.on "connection", (socket) ->
   socket.on "quieroMisStatsConQuesoAHORA", (data) ->
-    cl "+ alguien quiere stats. ahora somos #{usersStats.length}"
     usersStats.push socket
+    cl "+ alguien quiere stats. ahora somos #{usersStats.length}"
     socket.emit 'ready'
     socket.on 'disconnect', (socket) ->
       cl "- alguien ya quiere no stats. ahora somos #{usersStats.length}"
