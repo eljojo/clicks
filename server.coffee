@@ -35,7 +35,7 @@ enviarTop = ->
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
   for user in users
-    treshold = if user.maxLastClick > 0 then 2 else -1
+    treshold = if user.maxLastClick > 0 then 1 else -1
     user.maxLastClick = obtenerSegundos(user.lastClick) if user.lastClick != '' and obtenerSegundos(user.lastClick) > treshold
   topsClickPressed = users.sort (a,b) ->
     b.maxLastClick - a.maxLastClick
