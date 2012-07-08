@@ -35,7 +35,7 @@ enviarTop = ->
   topsClickPressed = (user for user in users when user.lastClick != '') # filtramos
   topsClickPressed = topsClickPressed.sort (a,b) ->
     a.lastClick.getTime() - b.lastClick.getTime()
-  topsClickPressed = (user for user in users when obtenerSegundos(user.lastClick) > 0) # filtramos
+  topsClickPressed = (user for user in topsClickPressed when obtenerSegundos(topsClickPressed.lastClick) > 0) # filtramos
   topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: obtenerSegundos user.lastClick }
   
   # -- top por tiempo y clicks
