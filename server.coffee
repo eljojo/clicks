@@ -33,15 +33,11 @@ enviarTop = ->
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
   topsClickPressed = users.sort (a,b) ->
-    return 0 if b.clicks.length == 0 and a.clicks.length == 0
-    return 1 if b.clicks.length == 0
-    return -1 if a.clicks.length == 0
-    b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
-  actualTime = new Date()
-  if user.clicks.length > 0
-    topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
-# #   else
-#     topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: 0}
+    return 0 if b.lastClick == '' and a..lastClick == ''
+    return 1 if b.lastClick == ''
+    return -1 if a.lastClick == ''
+    b.lastClick.getTime() - a.lastClick.getTime()
+  topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, id: user.id, tiempo: obtenerSegundos user.lastClick }
   # -- top por tiempo y clicks
   masAntiguo = users[0]
   masAntiguo = { clicks: [new Date()] } if users[0].clicks.length == 0
