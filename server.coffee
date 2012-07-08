@@ -104,7 +104,7 @@ io.sockets.on "connection", (socket) ->
     # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
-      user.lastClick = ''
+      # user.lastClick = ''
       cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
       
