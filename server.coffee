@@ -106,7 +106,7 @@ io.sockets.on "connection", (socket) ->
     # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
-      user.maxLastClick = obtenerSegundos(user.lastClick)
+      user.maxLastClick = obtenerSegundos(user.lastClick) if obtenerSegundos(user.lastClick) > user.maxLastClick
       user.lastClick = ''
       # cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
