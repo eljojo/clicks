@@ -32,10 +32,11 @@ enviarTop = ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
-  user.maxLastClick = obtenerSegundos(user.lastClick) for user in users when user.lastClick != ''
-  topsClickPressed = topsClickPressed.sort (a,b) ->
+  for user in users
+    user.maxLastClick = obtenerSegundos(user.lastClick) when user.lastClick != ''
+  topsClickPressed = users.sort (a,b) ->
     a.maxLastClick - b.maxLastClick
-  topsClickPressed = (user for user in users when user.maxLastClick > 0)
+  topsClickPressed = (user for user in topsClickPressed when user.maxLastClick > 0)
   topsClickPressed = topsClickPressed[0..9].map (user) -> { nombre: user.name, id: user.id, tiempo: user.maxLastClick }
   
   # -- top por tiempo y clicks
