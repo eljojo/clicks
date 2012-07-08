@@ -80,7 +80,8 @@ enviarTop = ->
   user.socket.emit 'top', top for user in users
 
 sendStats = ->
-  socket.emit 'stats!', {date: clicksStats[0], clicks: clicksStats.length } for socket in usersStats 
+  if clicksStats.length > 0
+    socket.emit 'stats!', {date: clicksStats[0], clicks: clicksStats.length } for socket in usersStats 
   clicksStats = []
 
 users = []
