@@ -61,7 +61,7 @@ users = []
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   user = 
-    id: conexiones.length
+    id: ''
     name: ''
     clicks: []
     lastClick: ''
@@ -74,10 +74,10 @@ io.sockets.on "connection", (socket) ->
     users.remove user
     cl "- ahora somos #{users.length}"
   
-  socket.on "name", (name) ->
-    user.name = name
-    socket.set 'name', name, ->
-      socket.emit 'ready'
+  socket.on "userData", (data) ->
+    user.name = data.nombre
+    user.id = data.id
+    socket.emit 'ready'
     
   socket.on "clickDown", (data) ->
     #user.clicks.push new Date
