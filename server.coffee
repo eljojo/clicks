@@ -76,7 +76,7 @@ conexiones = []
 users = []
 setInterval( ->
   enviarTop() if users.length > 0 and users[0].clicks.length > 0
-, 500)
+, 250)
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
