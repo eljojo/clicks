@@ -33,7 +33,7 @@ enviarTop = ->
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
   topsClickPressed = users.sort (a,b) ->
-    return 0 if b.lastClick == '' and a..lastClick == ''
+    return 0 if b.lastClick == '' and a.lastClick == ''
     return 1 if b.lastClick == ''
     return -1 if a.lastClick == ''
     b.lastClick.getTime() - a.lastClick.getTime()
