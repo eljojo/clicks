@@ -14,9 +14,9 @@ getHora = (date) ->
   date.getHours() + ":#{minutos}:#{segundos}"
 
 calcularPuntaje = (user) ->
+  return 0 if user.clicks.length == 0
   clicks = user.clicks
   totalClicks = clicks.length
-  return 0 if totalClicks == 0
   tiempo_de_juego = (clicks[totalClicks - 1].getTime() - clicks[0].getTime())/1000
   puntaje = Math.pow(totalClicks, 2) * Math.log(tiempo_de_juego) / (Math.log(10) * Math.pow(tiempo_de_juego, 1.2))
   if puntaje == -Infinity then puntaje = 0
@@ -26,7 +26,8 @@ obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTim
 
 enviarTop = ->
   # -- tops puntaje
-  user.puntaje = calcularPuntaje(user) for user in users
+  for user in users
+    user.puntaje = calcularPuntaje(user)
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
