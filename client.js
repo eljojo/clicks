@@ -8,7 +8,8 @@ $(function() {
   
   socket.emit('quieroMisStatsConQuesoAHORA')
   socket.on('stats!', function(stats) {
-    clicks.append(stats.fecha, stats.clicks);
+    console.log(stats)
+    clicks.append(stats.date, stats.clicks);
   })
   
 })
