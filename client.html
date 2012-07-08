@@ -8,18 +8,12 @@
   <script type="text/javascript">
   js_base = "http://"+window.location.host;
   document.write(unescape("%3Cscript src='" + js_base + "/socket.io/socket.io.js' type='text/javascript'%3E%3C/script%3E"));
+    document.write(unescape("%3Cscript src='" + js_base + "/smoothie.js' type='text/javascript'%3E%3C/script%3E"));
   document.write(unescape("%3Cscript src='" + js_base + "/client.js' type='text/javascript'%3E%3C/script%3E"));
   </script>
 </head>
 <body>
 	<h2>Clicks!</h2>
-	<div>
-    <input type="text" id="nombre" placeholder="escribe tu nombre" />
-    <button id="boton">boton</button>
-  </div>
-  <div>
-    <h3>clicks</h3>
-    <ul id="clicks"></ul>
-  </div>
+  <canvas id="clicks_stats" width="600" height="300"></canvas>
 </body>
 </html>
