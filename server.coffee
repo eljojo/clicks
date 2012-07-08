@@ -28,6 +28,11 @@ enviarTop = ->
   topsPuntaje = users.sort (a,b) ->
     b.puntaje - a.puntaje
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, puntaje: user.puntaje}
+  # tops click presionado
+  topsClickPressed = users.sort (a,b) ->
+    b.clicks[b.clicks.length - 1].getTime() - a.clicks[a.clicks.length - 1].getTime()
+  actualTime = new Date()
+  topsClickPressed = topsClickPressed[0..9].map (user) -> {nombre: user.name, tiempo: user.clicks[user.clicks.length - 1].getTime() - actualTime.getTime()}
   # top de usuarios
   masAntiguo = users[0]
   masClicks = users[0]
@@ -36,6 +41,7 @@ enviarTop = ->
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
   top =
     puntajes: topsPuntaje
+    clickApretado: topsClickPressed
     tiempo: { nombre: masAntiguo.name, tiempo: obtenerSegundos masAntiguo.clicks[0] }
     clicks: { nombre: masClicks.name, clicks: masClicks.clicks.length }
   conexion.emit 'top', top for conexion in conexiones
@@ -80,16 +86,14 @@ io.sockets.on "connection", (socket) ->
       socket.emit 'ready'
     
   socket.on "clickDown", (data) ->
-    #user.clicks.push new Date
-    #user.lastClick = new Date
-    # cl "click down! #{user.name}: #{getHora(user.lastClick)}"
-#    for conexion in conexiones
-#      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
+    user.lastClick = new Date
+    cl "puntaje de usuario #{user.name}: #{user.puntaje}"
+    for conexion in conexiones
+      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
     
   socket.on "clickUp", (data) ->
     user.clicks.push new Date
     user.puntaje = calcularPuntaje(user)
-    cl "puntaje de usuario #{user.name}: #{user.puntaje}"
 #     for conexion in conexiones
 #      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
     enviarTop()
