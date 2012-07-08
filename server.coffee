@@ -79,15 +79,16 @@ enviarTop = ->
     noob: masNoob
   user.socket.emit 'top', top for user in users
 
-sendStats = ->
-  if clicksStats.length > 0
-    socket.emit 'stats!', {date: clicksStats[0], clicks: clicksStats.length } for socket in usersStats 
-  clicksStats = []
-
 users = []
 
 usersStats = []
 clicksStats = [] # usamos este arreglo para las estadisticas en tiempo real
+
+sendStats = ->
+  if clicksStats.length > 0
+    for socket in usersStats 
+      socket.emit 'stats!', {date: clicksStats[0], clicks: clicksStats.length }
+  clicksStats = []
 
 setInterval( ->
   enviarTop() if users.length > 0 and users[0].clicks.length > 0
@@ -96,11 +97,13 @@ setInterval( ->
 
 io.sockets.on "connection", (socket) ->
   socket.on "quieroMisStatsConQuesoAHORA", (data) ->
+    cl "+ alguien quiere stats. ahora somos #{usersStats.length}"
     usersStats.push socket
     socket.emit 'ready'
     socket.on 'disconnect', (socket) ->
+      cl "- alguien ya quiere no stats. ahora somos #{usersStats.length}"
       usersStats.remove socket
-  
+
   socket.on "userData", (data) ->
     user = 
       id: data.id
@@ -125,7 +128,7 @@ io.sockets.on "connection", (socket) ->
     # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
-      clicksStats.push new Date if usersStats.length > 0 # enviamos el click para registrar las stats
+      clicksStats.push (new Date) if usersStats.length > 0 # enviamos el click para registrar las stats
       user.maxLastClick = obtenerSegundos(user.lastClick) if obtenerSegundos(user.lastClick) > user.maxLastClick
       user.lastClick = ''
       # cl "puntaje de #{user.name}: #{user.puntaje}"
