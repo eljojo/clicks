@@ -33,7 +33,7 @@ enviarTop = ->
   topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
   # -- tops click presionado
   for user in users
-    user.maxLastClick = obtenerSegundos(user.lastClick) if user.lastClick != '' and obtenerSegundos(user.lastClick) > 0
+    user.maxLastClick = obtenerSegundos(user.lastClick) if user.lastClick != '' and obtenerSegundos(user.lastClick) > user.maxLastClick
   topsClickPressed = users.sort (a,b) ->
     a.maxLastClick - b.maxLastClick
   topsClickPressed = (user for user in topsClickPressed when user.maxLastClick > 0)
@@ -108,6 +108,6 @@ io.sockets.on "connection", (socket) ->
       user.clicks.push new Date
       user.maxLastClick = obtenerSegundos(user.lastClick)
       user.lastClick = ''
-      cl "puntaje de #{user.name}: #{user.puntaje}"
+      # cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
       
