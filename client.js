@@ -1,4 +1,4 @@
-socket_server = (window.location.hostname.indexOf('heroku') > 0 || window.location.hostname.indexOf('soyseco.cl') > 0) ? 'http://eljojo.net:3456' : 'http://'+window.location.hostname
+socket_server = (window.location.hostname.indexOf('heroku') > 0) ? 'http://eljojo.net:3456' : 'http://'+window.location.hostname
 var socket = io.connect(socket_server);
 $(function() {
   $("#boton").hide()
@@ -22,6 +22,9 @@ $(function() {
     if($("#clicks li").length > 10) {
       $("#clicks li").last().remove()
     }
+  })
+  socket.on('enviandoTop', function(top){
+    console.log(top)
   })
   socket.on('ready', function(){
     $("#boton").show()

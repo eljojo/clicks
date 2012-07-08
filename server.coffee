@@ -24,9 +24,9 @@ calcularPuntaje = (user) ->
 
 enviarTop = ->
   topsPuntaje = users.sort (a,b) ->
-    a.puntaje - b.puntaje
-  topsPuntaje = topsPuntaje[0..9].map (in) -> {name: in.name, puntaje: in.puntaje}
-  conexion.emit 'enviandoTop',topsPuntaje for conexion in conexiones
+    b.puntaje - a.puntaje
+  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, puntaje: user.puntaje}
+  conexion.emit 'topPuntajes', topsPuntaje for conexion in conexiones
 
 handler = (req, res) ->
   peticion = (if (req.url is "/") then "/client.html" else req.url)
@@ -77,10 +77,10 @@ io.sockets.on "connection", (socket) ->
   socket.on "clickUp", (data) ->
     user.clicks.push new Date
     user.puntaje = calcularPuntaje(user)
-    cl "puntaje de usuario #{user.name}: #{puntaje}"
+    cl "puntaje de usuario #{user.name}: #{user.puntaje}"
 #     for conexion in conexiones
 #      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
-    enviarTop
+    enviarTop()
     
 
   
