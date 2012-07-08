@@ -1,5 +1,22 @@
 # ---- clicks server ----
 
+handler = (req, res) ->
+  peticion = (if (req.url is "/") then "/client.html" else req.url)
+  fs.readFile __dirname + peticion, (err, data) ->
+    if err
+      res.writeHead 500
+      return res.end("Error loading index.html")
+    res.writeHead 200
+    res.end data
+
+app = require("http").createServer(handler)
+io = require("socket.io").listen(app)
+fs = require("fs")
+
+port = process.env.PORT || 3456
+app.listen port
+io.set "log level", 1
+
 # -- funciones
 # alias a console.log
 cl = (what) -> console.log(what)
@@ -30,28 +47,29 @@ calcularPuntaje = (user) ->
 enviarTop = ->
   # -- tops puntaje
   user.puntaje = calcularPuntaje(user) for user in users
-  topsPuntaje = users.sort (a,b) ->
-    b.puntaje - a.puntaje
-  topsPuntaje = topsPuntaje[0..9].map (user) -> {nombre: user.name, id: user.id, puntaje: user.puntaje}
+  topsPuntaje = users.sort (a,b) -> b.puntaje - a.puntaje
+  topsPuntaje = topsPuntaje[0..9].map (user) -> { nombre: user.name, id: user.id, puntaje: user.puntaje }
   # -- tops click presionado
   for user in users
     user.maxLastClick = obtenerSegundos(user.lastClick) if obtenerSegundos(user.lastClick) > 0
-  topsClickPressed = users.sort (a,b) ->
-    b.maxLastClick - a.maxLastClick
+  topsClickPressed = users.sort (a,b) -> b.maxLastClick - a.maxLastClick
   # topsClickPressed = (user for user in topsClickPressed when user.maxLastClick > 0)
   topsClickPressed = topsClickPressed[0..9].map (user) -> { nombre: user.name, id: user.id, tiempo: user.maxLastClick }
   
   # -- top por tiempo y clicks
   masAntiguo = users[0]
-  masAntiguo = { clicks: [new Date()] } if users[0].clicks.length == 0
+  if users[0].clicks.length == 0 then masAntiguo = { clicks: [new Date()] }
   masClicks = users[0]
   for user in users
-    continue if user.clicks.length == 0
-    masAntiguo = user if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
-    masClicks = user if user.clicks.length > masAntiguo.clicks.length
+    if user.clicks.length == 0 then continue
+    if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
+      masAntiguo = user 
+    if user.clicks.length > masAntiguo.clicks.length
+      masClicks = user
+  # -- noob
   randomNoob = Math.round((users.length - 1)* Math.random())
   randomNoob = 0 if randomNoob < 0
-  masNoob = {nombre: users[randomNoob].name, id: users[randomNoob].id}
+  masNoob = { nombre: users[randomNoob].name, id: users[randomNoob].id }
   # formateamos el resultado y enviamos
   top =
     puntajes: topsPuntaje
@@ -59,35 +77,18 @@ enviarTop = ->
     tiempo: { nombre: masAntiguo.name, id: masAntiguo.id, tiempo: obtenerSegundos masAntiguo.clicks[0] }
     clicks: { nombre: masClicks.name, id: masClicks.id, clicks: masClicks.clicks.length }
     noob: masNoob
-  conexion.emit 'top', top for conexion in conexiones
+  user.socket.emit 'top', top for user in users
 
-handler = (req, res) ->
-  peticion = (if (req.url is "/") then "/client.html" else req.url)
-  fs.readFile __dirname + peticion, (err, data) ->
-    if err
-      res.writeHead 500
-      return res.end("Error loading index.html")
-    res.writeHead 200
-    res.end data
-
-app = require("http").createServer(handler)
-io = require("socket.io").listen(app)
-fs = require("fs")
-
-port = process.env.PORT || 3456
-app.listen port
-io.set "log level", 1
-conexiones = []
 users = []
 setInterval( ->
   enviarTop() if users.length > 0 and users[0].clicks.length > 0
 , 250)
 io.sockets.on "connection", (socket) ->
-  conexiones.push socket
   socket.on "userData", (data) ->
     user = 
       id: data.id
       name: data.nombre
+      socket: socket
       clicks: []
       lastClick: ''
       maxLastClick: 0
@@ -98,14 +99,12 @@ io.sockets.on "connection", (socket) ->
     socket.emit 'ready'
     # -- user disconnect
     socket.on 'disconnect', (socket) ->
-      conexiones.remove socket
       users.remove user
       cl "se fue #{user.name}"
       cl "- ahora somos #{users.length}"
     # -- user click down
     socket.on "clickDown", (data) ->
       user.lastClick = new Date
-      # user.maxLastClick = 1 if user.maxLastClick == 0
     # -- user click up
     socket.on "clickUp", (data) ->
       user.clicks.push new Date
