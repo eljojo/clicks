@@ -20,7 +20,14 @@ calcularPuntaje = (user) ->
   puntaje = Math.pow(totalClicks, 2) * Math.log(tiempo_de_juego) / (Math.log(10) * Math.pow(tiempo_de_juego, 1.2))
   if puntaje == -Infinity then puntaje = 0
   return Math.round(puntaje * 10) 
-  
+
+
+enviarTop = ->
+  topsPuntaje = users.sort (a,b) ->
+    a.puntaje - b.puntaje
+  topsPuntaje = topsPuntaje[0..9].map (in) -> {name: in.name, puntaje: in.puntaje}
+  conexion.emit 'enviandoTop',topsPuntaje for conexion in conexiones
+
 handler = (req, res) ->
   peticion = (if (req.url is "/") then "/client.html" else req.url)
   fs.readFile __dirname + peticion, (err, data) ->
@@ -46,6 +53,7 @@ io.sockets.on "connection", (socket) ->
     name: ''
     clicks: []
     lastClick: ''
+    puntaje: 0
   users.push user
   cl "+ ahora somos #{users.length}"
   
@@ -68,9 +76,13 @@ io.sockets.on "connection", (socket) ->
     
   socket.on "clickUp", (data) ->
     user.clicks.push new Date
-    puntaje = calcularPuntaje(user)
+    user.puntaje = calcularPuntaje(user)
     cl "puntaje de usuario #{user.name}: #{puntaje}"
-    for conexion in conexiones
-      conexion.emit 'clickDe', {name: user.name, puntaje: puntaje}
-      
+#     for conexion in conexiones
+#      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
+    enviarTop
+    
+
+  
+
 
