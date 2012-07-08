@@ -13,10 +13,12 @@ getHora = (date) ->
   segundos = '0'+segundos if segundos < 10
   date.getHours() + ":#{minutos}:#{segundos}"
 
-obtenerSegundos = (tiempo) -> Math.round ((new Date()).getTime() - tiempo.getTime())/1000
+obtenerSegundos = (tiempo) -> 
+  return 0 unless typeof tiempo.getTime == 'function' # in case it's not a date
+  Math.round ((new Date()).getTime() - tiempo.getTime())/1000
 
 calcularPuntaje = (user) ->
-  # return Math.round(Math.random()*23456) if "#{user.id}" == "648489362" # epic trampa is epic trampa
+  # return Math.round(Math.random()*23456) if "#{user.id}" == "648489362" # epic trampa is epic trampa
   clicks = user.clicks
   totalClicks = clicks.length
   return 0 if totalClicks == 0
