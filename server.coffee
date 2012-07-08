@@ -72,38 +72,38 @@ conexiones = []
 users = []
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
-  user = 
-    id: ''
-    name: ''
-    clicks: []
-    lastClick: ''
-    puntaje: 0
-  users.push user
-  cl "+ ahora somos #{users.length}"
-  
-  socket.on 'disconnect', (socket) ->
-    conexiones.remove socket
-    users.remove user
-    cl "- ahora somos #{users.length}"
-  
   socket.on "userData", (data) ->
     user.name = data.nombre
     user.id = data.id
     cl "llegó #{user.name}, id: #{user.id}"
     socket.emit 'ready'
+  
+    user = 
+      id: ''
+      name: ''
+      clicks: []
+      lastClick: ''
+      puntaje: 0
+    users.push user
+    cl "+ ahora somos #{users.length}"
+  
+    socket.on 'disconnect', (socket) ->
+      conexiones.remove socket
+      users.remove user
+      cl "- ahora somos #{users.length}"
     
-  socket.on "clickDown", (data) ->
-    user.lastClick = new Date
-    cl "puntaje de usuario #{user.name}: #{user.puntaje}"
-    for conexion in conexiones
-      conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
+    socket.on "clickDown", (data) ->
+      user.lastClick = new Date
+      cl "puntaje de usuario #{user.name}: #{user.puntaje}"
+      for conexion in conexiones
+        conexion.emit 'clickDe', {name: user.name, clicks: user.clicks.length}
     
-  socket.on "clickUp", (data) ->
-    user.clicks.push new Date
-    user.puntaje = calcularPuntaje(user)
-#     for conexion in conexiones
-#      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
-    enviarTop()
+    socket.on "clickUp", (data) ->
+      user.clicks.push new Date
+      user.puntaje = calcularPuntaje(user)
+  #     for conexion in conexiones
+  #      conexion.emit 'clickDe', {name: user.name, puntaje: user.puntaje}
+      enviarTop()
     
 
   
