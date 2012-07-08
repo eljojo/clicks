@@ -73,11 +73,6 @@ users = []
 io.sockets.on "connection", (socket) ->
   conexiones.push socket
   socket.on "userData", (data) ->
-    user.name = data.nombre
-    user.id = data.id
-    cl "llegó #{user.name}, id: #{user.id}"
-    socket.emit 'ready'
-  
     user = 
       id: ''
       name: ''
@@ -86,7 +81,12 @@ io.sockets.on "connection", (socket) ->
       puntaje: 0
     users.push user
     cl "+ ahora somos #{users.length}"
-  
+    
+    user.name = data.nombre
+    user.id = data.id
+    cl "llegó #{user.name}, id: #{user.id}"
+    socket.emit 'ready'
+    
     socket.on 'disconnect', (socket) ->
       conexiones.remove socket
       users.remove user
