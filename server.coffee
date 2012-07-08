@@ -32,6 +32,7 @@ enviarTop = ->
   masAntiguo = users[0]
   masClicks = users[0]
   for user in users
+    next if user.clicks.length == 0
     masAntiguo = user if user.clicks[0].getTime() < masAntiguo.clicks[0].getTime()
     masClicks = user if user.clicks.length > masAntiguo.clicks.length
   top =
