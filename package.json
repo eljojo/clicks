@@ -1,8 +1,7 @@
 {
 	"name": "clicks",
 	"dependencies": {
-		"socket.io":"",
-		"coffee-script":""
+		"socket.io":""
 	},
 	"version":"0.0.1"
 }

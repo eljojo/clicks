@@ -44,6 +44,21 @@ calcularPuntaje = (user) ->
   if puntaje == -Infinity then puntaje = 0
   return Math.round(puntaje * 10) 
 
+enviarLista = (userId) ->
+  user.puntaje = calcularPuntaje(user) for user in users
+  topsPuntaje = users.sort (a,b) -> b.puntaje - a.puntaje
+  # -- tops click presionado
+  for user in users
+    user.maxLastClick = obtenerSegundos(user.lastClick) if obtenerSegundos(user.lastClick) > 0
+  topsClickPressed = users.sort (a,b) -> b.maxLastClick - a.maxLastClick
+  # -- obtenemos lista con usuario userId en el centro:
+  # formateamos el resultado y enviamos
+  topsPuntaje = topsPuntaje[(userId-2)..(userId+2)].map (user) -> { nombre: user.name, id: user.id, puntaje: user.puntaje }
+  lista =
+    puntajes: topsPuntaje
+    clickApretado: topsClickPressed
+  user.socket.emit 'lista', lista for user in users
+
 enviarTop = ->
   # -- tops puntaje
   user.puntaje = calcularPuntaje(user) for user in users
@@ -132,4 +147,5 @@ io.sockets.on "connection", (socket) ->
       user.lastClick = ''
       # cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
-      
+#    socket.on "getList", (userId) -> 
+#      enviarTop userId
