@@ -1,6 +1,11 @@
 # ---- clicks server ----
 
+# ips de github para reiniciar el servidor al hacer commit
+github_ips = ["207.97.227.253", "50.57.128.197", "108.171.174.178"]
+
+# servidor
 handler = (req, res) ->
+  process.exit() if github_ips.indexOf req.connection.remoteAddress > -1
   peticion = (if (req.url is "/") then "/client.html" else req.url)
   fs.readFile __dirname + peticion, (err, data) ->
     if err
