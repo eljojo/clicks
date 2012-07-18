@@ -27,7 +27,8 @@ io.set "log level", 1
 cl = (what) -> console.log(what)
 # remover elementos de un array. sacado de http://stackoverflow.com/questions/4825812/clean-way-to-remove-element-from-javascript-array-with-jquery-coffeescript
 Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
-# Date object a hora
+
+# -- Date object a hora
 getHora = (date) -> 
   minutos = date.getMinutes()
   minutos = '0'+minutos if minutos < 10
@@ -35,10 +36,12 @@ getHora = (date) ->
   segundos = '0'+segundos if segundos < 10
   date.getHours() + ":#{minutos}:#{segundos}"
 
+# -- Obtener diferencia de segundos respecto del tiempo actual
 obtenerSegundos = (tiempo) -> 
   return 0 unless typeof tiempo.getTime == 'function' # in case it's not a date
   Math.round ((new Date()).getTime() - tiempo.getTime())/1000
 
+# -- Obtiene puntaje por usuario en base a formula logaritmica.
 calcularPuntaje = (user) ->
   # return Math.round(Math.random()*23456) if "#{user.id}" == "648489362" # epic trampa is epic trampa
   clicks = user.clicks
@@ -49,6 +52,7 @@ calcularPuntaje = (user) ->
   if puntaje == -Infinity then puntaje = 0
   return Math.round(puntaje * 10) 
 
+# -- Obtiene lista de puntajes cercanos a usuario.
 enviarLista = (userId) ->
   user.puntaje = calcularPuntaje(user) for user in users
   topsPuntaje = users.sort (a,b) -> b.puntaje - a.puntaje
@@ -64,6 +68,7 @@ enviarLista = (userId) ->
     clickApretado: topsClickPressed
   user.socket.emit 'lista', lista for user in users
 
+# -- Obtiene lista de puntajes más altos actuales.
 enviarTop = ->
   # -- tops puntaje
   user.puntaje = calcularPuntaje(user) for user in users
@@ -75,7 +80,6 @@ enviarTop = ->
   topsClickPressed = users.sort (a,b) -> b.maxLastClick - a.maxLastClick
   # topsClickPressed = (user for user in topsClickPressed when user.maxLastClick > 0)
   topsClickPressed = topsClickPressed[0..9].map (user) -> { nombre: user.name, id: user.id, tiempo: user.maxLastClick }
-  
   # -- top por tiempo y clicks
   masAntiguo = users[0]
   if users[0].clicks.length == 0 then masAntiguo = { clicks: [new Date()] }
@@ -99,8 +103,25 @@ enviarTop = ->
     noob: masNoob
   user.socket.emit 'top', top for user in users
 
-users = []
+# -- Obtiene esperanza para determinar tiempo promedio de clicks
+# -- (implementacion inicial para evitar hacks).
+obtenerEsperanza = (user) ->
+  clicks = user.clicks
+  K = clicks.length
+  if K == 0 then return 0
+  sum = 0
+  t_k_1 = clicks[0]
+  count = 0
+  esp = 0;
+  for t_k in clicks
+    count = count + 1
+    sum += sum + t_k.getTime()
+    esp += Math.abs(t_k.getTime() - t_k_1.getTime())*count
+  return esp/sum
 
+  
+  
+users = []
 usersStats = []
 clicksStats = [] # usamos este arreglo para las estadisticas en tiempo real
 
@@ -132,6 +153,8 @@ io.sockets.on "connection", (socket) ->
       lastClick: ''
       maxLastClick: 0
       puntaje: 0
+      esperanza: 0
+      deltaEsperanza: 0
     users.push user
     cl "+ ahora somos #{users.length}"
     cl "llegó #{user.name}, id: #{user.id}"
@@ -152,5 +175,8 @@ io.sockets.on "connection", (socket) ->
       user.lastClick = ''
       # cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
+      user.esperanza = obtenerEsperanza(user) if user.clicks.length > 0 then
+	user.deltaEsperanza = Math.abs(user.deltaEsperanza - user.esperanza)
 #    socket.on "getList", (userId) -> 
 #      enviarTop userId
+      

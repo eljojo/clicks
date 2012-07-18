@@ -1,5 +1,5 @@
 //socket_server = (window.location.hostname.indexOf('heroku') > 0) ? 'http://eljojo.net:3456' : 'http://'+window.location.hostname
-socket_server = 'http://eljojo.net:3456'
+socket_server = 'http://localhost:3456'
 var socket = io.connect(socket_server);
 $(function() {
   var chart = new SmoothieChart();
