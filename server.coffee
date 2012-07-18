@@ -105,8 +105,8 @@ enviarTop = ->
 
 # -- Obtiene esperanza para determinar tiempo promedio de clicks
 # -- (implementacion inicial para evitar hacks).
-obtenerEsperanza = (user) ->
-  clicks = user.clicks
+obtenerEsperanza = (userin) ->
+  clicks = userin.clicks
   K = clicks.length
   if K == 0 then return 0
   sum = 0
@@ -119,8 +119,6 @@ obtenerEsperanza = (user) ->
     esp += Math.abs(t_k.getTime() - t_k_1.getTime())*count
   return esp/sum
 
-  
-  
 users = []
 usersStats = []
 clicksStats = [] # usamos este arreglo para las estadisticas en tiempo real
@@ -175,8 +173,9 @@ io.sockets.on "connection", (socket) ->
       user.lastClick = ''
       # cl "puntaje de #{user.name}: #{user.puntaje}"
       socket.emit 'self', {clicks: user.clicks.length, puntaje: user.puntaje}
-      user.esperanza = obtenerEsperanza(user) if user.clicks.length > 0 then
-	user.deltaEsperanza = Math.abs(user.deltaEsperanza - user.esperanza)
+      if user.clicks.length > 0
+        user.esperanza = obtenerEsperanza(user)
+        user.deltaEsperanza = Math.abs(user.deltaEsperanza - user.esperanza)
 #    socket.on "getList", (userId) -> 
 #      enviarTop userId
       
